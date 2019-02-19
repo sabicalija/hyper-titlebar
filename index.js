@@ -16,6 +16,7 @@ exports.decorateConfig = config => {
     closeBg: "#f25056",
     minimizeBg: "#fac536",
     maximizeBg: "#39ea49",
+    burgerBg: "white",
     borderColor: "#000"
   };
 
@@ -24,8 +25,18 @@ exports.decorateConfig = config => {
   return Object.assign({}, config, {
     css: `
       ${config.css || ""}
+      .terms_terms {
+        margin-top: 35px;
+      }
       .header_windowHeader {
         visibility: hidden;
+      }
+      .header {
+        background-color: #303030;
+        -webkit-app-region: drag;
+      }
+      .actions > * {
+        -webkit-app-region: no-drag;
       }
       .actions {
         display: inline-flex;
@@ -35,6 +46,7 @@ exports.decorateConfig = config => {
         height: 20px;
         border-radius: 50%;
         margin: 5px;
+        margin-bottom: 7px;
       }
       .close {
         background-color: red;
@@ -44,6 +56,14 @@ exports.decorateConfig = config => {
       }
       .maximize {
         background-color: green;
+      }
+      .burgerMenu {
+        background-color: white;
+        position: absolute;
+        right:0;
+      }
+      .header_hamburgerMenuLeft {
+        right: 0px;
       }
     `
   });
@@ -62,6 +82,7 @@ exports.decorateHeader = (Hyper, { React }) => {
       this.closeApp = this.closeApp.bind(this);
       this.minimizeApp = this.minimizeApp.bind(this);
       this.maximizeApp = this.maximizeApp.bind(this);
+      this.burgerMenu = this.burgerMenu.bind(this);
     }
 
     closeApp() {
@@ -83,6 +104,10 @@ exports.decorateHeader = (Hyper, { React }) => {
       }
     }
 
+    burgerMenu() {
+      this.props.openHamburgerMenu({ x: 0, y: 32 });
+    }
+
     render() {
       const el = React.createElement(
         "div",
@@ -92,7 +117,8 @@ exports.decorateHeader = (Hyper, { React }) => {
           { className: "actions" },
           React.createElement("span", { className: "close", onClick: this.closeApp }),
           React.createElement("span", { className: "minimize", onClick: this.minimizeApp }),
-          React.createElement("span", { className: "maximize", onClick: this.maximizeApp })
+          React.createElement("span", { className: "maximize", onClick: this.maximizeApp }),
+          React.createElement("span", { className: "burgerMenu", onClick: this.burgerMenu })
         )
       );
       return React.createElement(
