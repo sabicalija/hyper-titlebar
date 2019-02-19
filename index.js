@@ -24,6 +24,27 @@ exports.decorateConfig = config => {
   return Object.assign({}, config, {
     css: `
       ${config.css || ""}
+      .header_windowHeader {
+        visibility: hidden;
+      }
+      .actions {
+        display: inline-flex;
+      }
+      .actions span {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin: 5px;
+      }
+      .close {
+        background-color: red;
+      }
+      .minimize {
+        background-color: yellow;
+      }
+      .maximize {
+        background-color: green;
+      }
     `
   });
 };
@@ -43,14 +64,43 @@ exports.decorateHeader = (Hyper, { React }) => {
       this.maximizeApp = this.maximizeApp.bind(this);
     }
 
-    closeApp() {}
+    closeApp() {
+      this.state.window.close();
+    }
 
-    minimizeApp() {}
+    minimizeApp() {
+      this.state.window.minimize();
+      this.state.maximized = false;
+    }
 
-    maximizeApp() {}
+    maximizeApp() {
+      if (this.state.maximized == true) {
+        this.state.window.unmaximize();
+        this.state.maximized = false;
+      } else {
+        this.state.window.maximize();
+        this.state.maximized = true;
+      }
+    }
 
     render() {
-      return React.createElement(Hyper);
+      const el = React.createElement(
+        "div",
+        { className: "header" },
+        React.createElement(
+          "div",
+          { className: "actions" },
+          React.createElement("span", { className: "close", onClick: this.closeApp }),
+          React.createElement("span", { className: "minimize", onClick: this.minimizeApp }),
+          React.createElement("span", { className: "maximize", onClick: this.maximizeApp })
+        )
+      );
+      return React.createElement(
+        Hyper,
+        Object.assign({}, this.props, {
+          customChildren: el
+        })
+      );
     }
 
     componentDidMount() {
