@@ -2,14 +2,8 @@
 
 const { remote } = require("electron");
 
-exports.decorateConfig = config => {
-  const windowControls = config.showWindowControls;
-
-  if (windowControls === false) {
-    return config;
-  }
-
-  const titleBarConfig = {
+function loadTitlebarOptions({ titlebar: {} }) {
+  return (cfg = {
     iconSize: "16px",
     height: "26px",
     headerBg: "#2f343f",
@@ -18,9 +12,12 @@ exports.decorateConfig = config => {
     maximizeBg: "#39ea49",
     burgerBg: "white",
     borderColor: "#000"
-  };
+  });
+}
 
-  let isLeft = windowControls === "left";
+exports.decorateConfig = config => {
+  if (config.showWindowControls == false) return config;
+  let opts = loadTitlebarOptions(config);
 
   return Object.assign({}, config, {
     css: `
@@ -60,7 +57,7 @@ exports.decorateConfig = config => {
       .burgerMenu {
         background-color: white;
         position: absolute;
-        right:0;
+        right: 0;
       }
       .header_hamburgerMenuLeft {
         right: 0px;
