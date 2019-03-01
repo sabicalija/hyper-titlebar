@@ -2,28 +2,30 @@
 
 const { remote } = require("electron");
 
-function loadTitlebarOptions({ titlebar: {} }) {
-  return (cfg = {
-    iconSize: "16px",
-    height: "26px",
-    headerBg: "#2f343f",
-    closeBg: "#f25056",
-    minimizeBg: "#fac536",
-    maximizeBg: "#39ea49",
-    burgerBg: "white",
-    borderColor: "#000"
-  });
+function loadTitlebarOptions({ titlebar = {} }) {
+  return {
+    iconRadius: titlebar.iconRadius || "50%",
+    iconSize: titlebar.iconSize || "16px",
+    height: titlebar.height || "26px",
+    headerBg: titlebar.headerBg || "#2f343f",
+    closeBg: titlebar.closeBg || "#f25056",
+    minimizeBg: titlebar.minimizeBg || "#fac536",
+    maximizeBg: titlebar.maximizeBg || "#39ea49",
+    burgerBg: titlebar.burgerBg || "white",
+    borderColor: titlebar.borderColor || "#000"
+  };
 }
 
 exports.decorateConfig = config => {
   if (config.showWindowControls == false) return config;
+  let isLeft = config.showWindowsControls === "left";
   let opts = loadTitlebarOptions(config);
 
   return Object.assign({}, config, {
     css: `
       ${config.css || ""}
       .terms_terms {
-        margin-top: 35px;
+        margin-top: -webkit-calc(${opts.iconSize} + 15px);
       }
       .header_windowHeader {
         visibility: hidden;
@@ -36,31 +38,31 @@ exports.decorateConfig = config => {
         -webkit-app-region: no-drag;
       }
       .actions {
-        display: inline-flex;
+        display: -webkit-inline-flex;
       }
       .actions span {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
+        width: ${opts.iconSize};
+        height: ${opts.iconSize};
+        border-radius: ${opts.iconRadius};
         margin: 5px;
         margin-bottom: 7px;
       }
       .close {
-        background-color: red;
+        background-color: ${opts.closeBg};
       }
       .minimize {
-        background-color: yellow;
+        background-color: ${opts.minimizeBg};
       }
       .maximize {
-        background-color: green;
+        background-color: ${opts.maximizeBg};
       }
       .burgerMenu {
         background-color: white;
         position: absolute;
-        right: 0;
+        right: 0px;
       }
       .header_hamburgerMenuLeft {
-        right: 0px;
+        right : 0px;
       }
     `
   });
