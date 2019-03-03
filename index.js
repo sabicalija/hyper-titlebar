@@ -1,6 +1,7 @@
 "use strict";
 
 const fs = require("fs");
+const path = require("path");
 const { remote } = require("electron");
 const { library, dom } = require("@fortawesome/fontawesome-svg-core");
 const { fab } = require("@fortawesome/free-brands-svg-icons");
@@ -9,12 +10,14 @@ const { fas } = require("@fortawesome/free-solid-svg-icons");
 library.add(fas, far, fab);
 dom.watch();
 
+const configPath = path.join(__dirname, "cfg.json");
+
 function storeConfig(cfg) {
-  fs.writeFileSync("./cfg.json", JSON.stringify(cfg));
+  fs.writeFileSync(configPath, JSON.stringify(cfg));
 }
 
 function loadConfig() {
-  return JSON.parse(fs.readFileSync("./cfg.json"));
+  return JSON.parse(fs.readFileSync(configPath));
 }
 
 function loadTitlebarOptions({ titlebar = {} }) {
