@@ -23,28 +23,33 @@ function loadConfig() {
 
 function loadTitlebarOptions({ titlebar = {} }) {
   const cfg = {
-    glare: titlebar.glare || false,
-    glareScale: titlebar.glareScale || 0.25,
-    iconSize: titlebar.iconSize || "60%",
-    buttonRadius: titlebar.buttonRadius || "50%",
+    /* titlebar */
+    color: titlebar.color || "#303030",
+    height: `${parseInt(titlebar.buttonSize) + 14}px`,
+    radius: titlebar.radius || false,
+    /* buttons */
     buttonSize: titlebar.buttonSize || "20px",
-    height: titlebar.height || "26px",
-    headerBg: titlebar.headerBg || "#2f343f",
+    buttonRadius: titlebar.buttonRadius || "50%",
     closeButtonBg: titlebar.closeButtonBg || "#f25056",
-    closeIcon: titlebar.closeIcon || "fas fa-times",
-    closeIconCol: titlebar.closeIconCol || "#2f343f",
     minimizeButtonBg: titlebar.minimizeButtonBg || "#fac536",
-    minimizeIcon: titlebar.minimizeIcon || "fas fa-minus",
-    minimizeIconCol: titlebar.minimizeIconCol || "#2f343f",
     maximizeButtonBg: titlebar.maximizeButtonBg || "#39ea49",
-    maximizeIcon: titlebar.maximizeIcon || "fas fa-square",
-    maximizeIconCol: titlebar.maximizeIconCol || "#2f343f",
     optionsButtonBg: titlebar.optionsButtonBg || "white",
+    /* icons */
+    iconSize: titlebar.iconSize || "60%",
+    closeIcon: titlebar.closeIcon || "fas fa-times",
+    minimizeIcon: titlebar.minimizeIcon || "fas fa-minus",
+    maximizeIcon: titlebar.maximizeIcon || "fas fa-plus",
     optionsIcon: titlebar.optionsIcon || "fas fa-bars",
+    /* icon colors */
+    closeIconCol: titlebar.closeIconCol || "#2f343f",
+    minimizeIconCol: titlebar.minimizeIconCol || "#2f343f",
+    maximizeIconCol: titlebar.maximizeIconCol || "#2f343f",
     optionsIconCol: titlebar.optionsIconCol || "#2f343f",
-    borderColor: titlebar.borderColor || "#303030",
-    borderHeight: `${parseInt(titlebar.buttonSize) + 14}px`,
-    borderRadius: titlebar.borderRadius || false
+    /* rotation effect */
+    rotateSpeed: titlebar.rotateSpeed || "0.25s",
+    /* glare effect */
+    glare: titlebar.glare || false,
+    glareScale: titlebar.glareScale || 0.25
   };
 
   storeConfig(cfg);
@@ -83,16 +88,16 @@ exports.decorateConfig = config => {
     css: `
       ${config.css || ""}
       .terms_terms {
-        margin-top: ${opts.borderHeight};
+        margin-top: ${opts.height};
       }
       .header_windowHeader {
         visibility: hidden;
       }
       .header {
-        background-color: ${opts.borderColor};
+        background-color: ${opts.color};
         -webkit-app-region: drag;
         ${
-          opts.borderRadius
+          opts.radius
             ? `
         border-bottom-left-radius: ${parseInt(opts.buttonSize) / 2}px;
         border-bottom-right-radius: ${parseInt(opts.buttonSize) / 2}px;
@@ -129,7 +134,7 @@ exports.decorateConfig = config => {
         height: ${opts.iconSize};
       }
       .icon:hover {
-        animation: 'fa-spin' 0.4s infinite ease-in;
+        animation: 'fa-spin' ${opts.rotateSpeed} infinite ease-in;
         animation-iteration-count: 1;
       }
       /*
