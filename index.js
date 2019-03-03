@@ -168,7 +168,6 @@ exports.decorateHeader = (Hyper, { React }) => {
 
     render() {
       const opts = loadConfig();
-      console.log(opts);
       const titlebar = React.createElement(
         "div",
         { className: "header" },
