@@ -1,22 +1,43 @@
 "use strict";
 
+const fs = require("fs");
 const { remote } = require("electron");
-const FontAwesome = require("react-fontawesome");
+const { library, dom } = require("@fortawesome/fontawesome-svg-core");
+const { fab } = require("@fortawesome/free-brands-svg-icons");
+const { far } = require("@fortawesome/free-regular-svg-icons");
+const { fas } = require("@fortawesome/free-solid-svg-icons");
+library.add(fas, far, fab);
+dom.watch();
+
+function storeConfig(cfg) {
+  fs.writeFileSync("./cfg.json", JSON.stringify(cfg));
+}
+
+function loadConfig() {
+  return JSON.parse(fs.readFileSync("./cfg.json"));
+}
 
 function loadTitlebarOptions({ titlebar = {} }) {
-  return {
-    iconRadius: titlebar.iconRadius || "50%",
-    iconSize: titlebar.iconSize || "16px",
+  const cfg = {
+    buttonRadius: titlebar.buttonRadius || "50%",
+    buttonSize: titlebar.buttonSize || "16px",
     height: titlebar.height || "26px",
     headerBg: titlebar.headerBg || "#2f343f",
     closeBg: titlebar.closeBg || "#f25056",
-    minimizeBg: titlebar.minimizeBg || "#fac536",
-    maximizeBg: titlebar.maximizeBg || "#39ea49",
-    optionsBg: titlebar.optionsBg || "white",
+    closeIcon: titlebar.closeIcon || "fas fa-times",
+    minimizeButtonBg: titlebar.minimizeButtonBg || "#fac536",
+    minimizeIcon: titlebar.minimizeIcon || "fas fa-minus",
+    maximizeButtonBg: titlebar.maximizeButtonBg || "#39ea49",
+    maximizeIcon: titlebar.maximizeIcon || "far fa-square",
+    optionsButtonBg: titlebar.optionsButtonBg || "white",
+    optionsIcon: titlebar.optionsIcon || "fab fa-rebel",
     borderColor: titlebar.borderColor || "#303030",
-    borderHeight: `${parseInt(titlebar.iconSize) + 14}px`,
+    borderHeight: `${parseInt(titlebar.buttonSize) + 14}px`,
     borderRadius: titlebar.borderRadius || false
   };
+
+  storeConfig(cfg);
+  return cfg;
 }
 
 exports.decorateConfig = config => {
@@ -39,8 +60,8 @@ exports.decorateConfig = config => {
         ${
           opts.borderRadius
             ? `
-        border-bottom-left-radius: ${parseInt(opts.iconSize) / 2}px;
-        border-bottom-right-radius: ${parseInt(opts.iconSize) / 2}px;
+        border-bottom-left-radius: ${parseInt(opts.buttonSize) / 2}px;
+        border-bottom-right-radius: ${parseInt(opts.buttonSize) / 2}px;
         `
             : ""
         }
@@ -51,39 +72,52 @@ exports.decorateConfig = config => {
       }
       .actions div {
         -webkit-app-region: no-drag;
-        width: ${opts.iconSize};
-        height: ${opts.iconSize};
-        border-radius: ${opts.iconRadius};
+        width: ${opts.buttonSize};
+        height: ${opts.buttonSize};
+        border-radius: ${opts.buttonRadius};
         margin-top: 5px;
         margin-bottom: 7px;
+        display: -webkit-flex;
+        align-items: center;
       }
       .close {
         background-color: ${opts.closeBg};
         order: ${isLeft ? "1" : "4"};
-        margin-right: ${isLeft ? "5px" : "5px"};
-        margin-left: ${isLeft ? "5px" : "5px"};
+        margin-right: 5px;
+        margin-left: 5px;
       }
       .minimize {
-        background-color: ${opts.minimizeBg};
+        background-color: ${opts.minimizeButtonBg};
         order: ${isLeft ? "2" : "3"};
-        margin-right: ${isLeft ? "5px" : "5px"};
-        margin-left: ${isLeft ? "5px" : "5px"};
+        margin-right: 5px;
+        margin-left: 5px;
       }
       .maximize {
-        background-color: ${opts.maximizeBg};
+        background-color: ${opts.maximizeButtonBg};
         order: ${isLeft ? "3" : "2"};
-        margin-right: ${isLeft ? "5px" : "5px"};
+        margin-right: 5px;
         margin-left: ${isLeft ? "5px" : "auto"};
       }
       .optionsMenu {
-        background-color: ${opts.optionsBg};
+        background-color: ${opts.optionsButtonBg};
         order: ${isLeft ? "4" : "1"};
-        margin-right: ${isLeft ? "5px" : "5px"};
+        margin-right: 5px;
         margin-left: ${isLeft ? "auto" : "5px"};
       }
-      .super-crazy-colors {
-        width: 20px;
-        height: 20px;
+      .icon {
+        margin: auto;
+        display: block;
+        width: 60%;
+        height: 60%;
+      }
+      .icon:hover {
+        animation: 'fa-spin' 0.4s infinite ease-in;
+        /* animation-name: 'fa-spin'; */
+        animation-iteration-count: 1;
+      }
+      .dummy {
+        prefix: 'fas';
+        data-icon: 'times';
       }
     `
   });
@@ -130,6 +164,8 @@ exports.decorateHeader = (Hyper, { React }) => {
     }
 
     render() {
+      const opts = loadConfig();
+      console.log(opts);
       const titlebar = React.createElement(
         "div",
         { className: "header" },
@@ -139,21 +175,23 @@ exports.decorateHeader = (Hyper, { React }) => {
           React.createElement(
             "div",
             { className: "close", onClick: this.closeApp },
-            React.createElement(FontAwesome, {
-              className: "super-crazy-colors",
-              name: "rocket",
-              size: "2x",
-              style: {
-                textShadow: "0 1px 0 rgba(0, 0, 0, 0.1)",
-                display: "block",
-                width: "42px",
-                height: "42px"
-              }
-            })
+            React.createElement("i", { className: `icon ${opts.closeIcon}` })
           ),
-          React.createElement("div", { className: "minimize", onClick: this.minimizeApp }),
-          React.createElement("div", { className: "maximize", onClick: this.maximizeApp }),
-          React.createElement("div", { className: "optionsMenu", onClick: this.optionsMenu })
+          React.createElement(
+            "div",
+            { className: "minimize", onClick: this.minimizeApp },
+            React.createElement("i", { className: `icon ${opts.minimizeIcon}` })
+          ),
+          React.createElement(
+            "div",
+            { className: "maximize", onClick: this.maximizeApp },
+            React.createElement("i", { className: `icon ${opts.maximizeIcon}` })
+          ),
+          React.createElement(
+            "div",
+            { className: "optionsMenu", onClick: this.optionsMenu },
+            React.createElement("i", { className: `icon ${opts.optionsIcon}` })
+          )
         )
       );
       return React.createElement(
