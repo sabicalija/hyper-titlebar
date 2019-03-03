@@ -3,6 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const { remote } = require("electron");
+const color = require("color");
 const { library, dom } = require("@fortawesome/fontawesome-svg-core");
 const { fab } = require("@fortawesome/free-brands-svg-icons");
 const { far } = require("@fortawesome/free-regular-svg-icons");
@@ -22,18 +23,25 @@ function loadConfig() {
 
 function loadTitlebarOptions({ titlebar = {} }) {
   const cfg = {
+    glare: titlebar.glare || false,
+    glareScale: titlebar.glareScale || 0.25,
+    iconSize: titlebar.iconSize || "60%",
     buttonRadius: titlebar.buttonRadius || "50%",
-    buttonSize: titlebar.buttonSize || "16px",
+    buttonSize: titlebar.buttonSize || "20px",
     height: titlebar.height || "26px",
     headerBg: titlebar.headerBg || "#2f343f",
-    closeBg: titlebar.closeBg || "#f25056",
+    closeButtonBg: titlebar.closeButtonBg || "#f25056",
     closeIcon: titlebar.closeIcon || "fas fa-times",
+    closeIconCol: titlebar.closeIconCol || "#2f343f",
     minimizeButtonBg: titlebar.minimizeButtonBg || "#fac536",
     minimizeIcon: titlebar.minimizeIcon || "fas fa-minus",
+    minimizeIconCol: titlebar.minimizeIconCol || "#2f343f",
     maximizeButtonBg: titlebar.maximizeButtonBg || "#39ea49",
-    maximizeIcon: titlebar.maximizeIcon || "far fa-square",
+    maximizeIcon: titlebar.maximizeIcon || "fas fa-square",
+    maximizeIconCol: titlebar.maximizeIconCol || "#2f343f",
     optionsButtonBg: titlebar.optionsButtonBg || "white",
-    optionsIcon: titlebar.optionsIcon || "fab fa-rebel",
+    optionsIcon: titlebar.optionsIcon || "fas fa-bars",
+    optionsIconCol: titlebar.optionsIconCol || "#2f343f",
     borderColor: titlebar.borderColor || "#303030",
     borderHeight: `${parseInt(titlebar.buttonSize) + 14}px`,
     borderRadius: titlebar.borderRadius || false
@@ -41,6 +49,29 @@ function loadTitlebarOptions({ titlebar = {} }) {
 
   storeConfig(cfg);
   return cfg;
+}
+
+function iconStyle(btn, col, iconCol, order, marginLeft, opts) {
+  return `
+    .${btn} {
+      background-color: ${col};
+      ${
+        opts.glare
+          ? `
+      background-image: radial-gradient(${color(col)
+        .lighten(0.3)
+        .rgb()}, ${col} ${parseInt(opts.buttonSize) * opts.glareScale}px);
+        `
+          : ""
+      }
+      order: ${order};
+      margin-right: 5px;
+      margin-left: ${marginLeft};
+    }
+    .${btn}-icon {
+      color: ${iconCol};
+    }
+  `;
 }
 
 exports.decorateConfig = config => {
@@ -83,45 +114,37 @@ exports.decorateConfig = config => {
         display: -webkit-flex;
         align-items: center;
       }
-      .close {
-        background-color: ${opts.closeBg};
-        order: ${isLeft ? "1" : "4"};
-        margin-right: 5px;
-        margin-left: 5px;
-      }
-      .minimize {
-        background-color: ${opts.minimizeButtonBg};
-        order: ${isLeft ? "2" : "3"};
-        margin-right: 5px;
-        margin-left: 5px;
-      }
-      .maximize {
-        background-color: ${opts.maximizeButtonBg};
-        order: ${isLeft ? "3" : "2"};
-        margin-right: 5px;
-        margin-left: ${isLeft ? "5px" : "auto"};
-      }
-      .optionsMenu {
-        background-color: ${opts.optionsButtonBg};
-        order: ${isLeft ? "4" : "1"};
-        margin-right: 5px;
-        margin-left: ${isLeft ? "auto" : "5px"};
-      }
+
+      ${iconStyle("close", opts.closeButtonBg, opts.closeIconCol, isLeft ? "1" : "4", isLeft ? "5px" : "5px", opts)}
+      
+      ${iconStyle("minimize", opts.minimizeButtonBg, opts.minimizeIconCol, isLeft ? "2" : "3", isLeft ? "5px" : "5px", opts)}
+
+      ${iconStyle("maximize", opts.maximizeButtonBg, opts.maximizeIconCol, isLeft ? "3" : "2", isLeft ? "5px" : "auto", opts)}
+
+      ${iconStyle("options", opts.optionsButtonBg, opts.optionsIconCol, isLeft ? "4" : "1", isLeft ? "auto" : "5px", opts)}
       .icon {
         margin: auto;
         display: block;
-        width: 60%;
-        height: 60%;
+        width: ${opts.iconSize};
+        height: ${opts.iconSize};
       }
       .icon:hover {
         animation: 'fa-spin' 0.4s infinite ease-in;
-        /* animation-name: 'fa-spin'; */
         animation-iteration-count: 1;
       }
-      .dummy {
-        prefix: 'fas';
-        data-icon: 'times';
-      }
+      /*
+      .actions-btn:after {
+        content: '';
+        position: absolute;
+        -webkit-app-region: no-drag;
+        width: ${opts.buttonSize};
+        height: ${parseInt(opts.buttonSize) / 2}px;
+        border-radius: ${opts.buttonRadius};
+        padding-bottom: ${parseInt(opts.buttonSize) / 2}px;
+        display: -webkit-flex;
+        align-items: center;
+        background: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.2));
+      }*/
     `
   });
 };
@@ -176,23 +199,23 @@ exports.decorateHeader = (Hyper, { React }) => {
           { className: "actions" },
           React.createElement(
             "div",
-            { className: "close", onClick: this.closeApp },
-            React.createElement("i", { className: `icon ${opts.closeIcon}` })
+            { className: "actions-btn close", onClick: this.closeApp },
+            React.createElement("i", { className: `icon close-icon ${opts.closeIcon}` })
           ),
           React.createElement(
             "div",
-            { className: "minimize", onClick: this.minimizeApp },
-            React.createElement("i", { className: `icon ${opts.minimizeIcon}` })
+            { className: "actions-btn minimize", onClick: this.minimizeApp },
+            React.createElement("i", { className: `icon minimize-icon ${opts.minimizeIcon}` })
           ),
           React.createElement(
             "div",
-            { className: "maximize", onClick: this.maximizeApp },
-            React.createElement("i", { className: `icon ${opts.maximizeIcon}` })
+            { className: "actions-btn maximize", onClick: this.maximizeApp },
+            React.createElement("i", { className: `icon maximize-icon ${opts.maximizeIcon}` })
           ),
           React.createElement(
             "div",
-            { className: "optionsMenu", onClick: this.optionsMenu },
-            React.createElement("i", { className: `icon ${opts.optionsIcon}` })
+            { className: "actions-btn options", onClick: this.optionsMenu },
+            React.createElement("i", { className: `icon options-icon ${opts.optionsIcon}` })
           )
         )
       );
