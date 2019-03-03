@@ -13,7 +13,8 @@ function loadTitlebarOptions({ titlebar = {} }) {
     maximizeBg: titlebar.maximizeBg || "#39ea49",
     optionsBg: titlebar.optionsBg || "white",
     borderColor: titlebar.borderColor || "#303030",
-    borderHeight: `${parseInt(titlebar.iconRadius)}px`
+    borderHeight: `${parseInt(titlebar.iconRadius)}px`,
+    borderRadius: titlebar.borderRadius || false
   };
 }
 
@@ -34,6 +35,15 @@ exports.decorateConfig = config => {
       .header {
         background-color: ${opts.borderColor};
         -webkit-app-region: drag;
+        ${
+          opts.borderRadius
+            ? `
+        border-bottom-left-radius: ${parseInt(opts.iconSize) / 2}px;
+        border-bottom-right-radius: ${parseInt(opts.iconSize) / 2}px;
+        `
+            : ""
+        }
+
       }
       .actions {
         display: -webkit-flex;
