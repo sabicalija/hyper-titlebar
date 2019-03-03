@@ -1,6 +1,7 @@
 "use strict";
 
 const { remote } = require("electron");
+const FontAwesome = require("react-fontawesome");
 
 function loadTitlebarOptions({ titlebar = {} }) {
   return {
@@ -48,7 +49,7 @@ exports.decorateConfig = config => {
       .actions {
         display: -webkit-flex;
       }
-      .actions span {
+      .actions div {
         -webkit-app-region: no-drag;
         width: ${opts.iconSize};
         height: ${opts.iconSize};
@@ -79,6 +80,10 @@ exports.decorateConfig = config => {
         order: ${isLeft ? "4" : "1"};
         margin-right: ${isLeft ? "5px" : "5px"};
         margin-left: ${isLeft ? "auto" : "5px"};
+      }
+      .super-crazy-colors {
+        width: 20px;
+        height: 20px;
       }
     `
   });
@@ -131,10 +136,24 @@ exports.decorateHeader = (Hyper, { React }) => {
         React.createElement(
           "div",
           { className: "actions" },
-          React.createElement("span", { className: "close", onClick: this.closeApp }),
-          React.createElement("span", { className: "minimize", onClick: this.minimizeApp }),
-          React.createElement("span", { className: "maximize", onClick: this.maximizeApp }),
-          React.createElement("span", { className: "optionsMenu", onClick: this.optionsMenu })
+          React.createElement(
+            "div",
+            { className: "close", onClick: this.closeApp },
+            React.createElement(FontAwesome, {
+              className: "super-crazy-colors",
+              name: "rocket",
+              size: "2x",
+              style: {
+                textShadow: "0 1px 0 rgba(0, 0, 0, 0.1)",
+                display: "block",
+                width: "42px",
+                height: "42px"
+              }
+            })
+          ),
+          React.createElement("div", { className: "minimize", onClick: this.minimizeApp }),
+          React.createElement("div", { className: "maximize", onClick: this.maximizeApp }),
+          React.createElement("div", { className: "optionsMenu", onClick: this.optionsMenu })
         )
       );
       return React.createElement(
