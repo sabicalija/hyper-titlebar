@@ -11,58 +11,64 @@ function loadTitlebarOptions({ titlebar = {} }) {
     closeBg: titlebar.closeBg || "#f25056",
     minimizeBg: titlebar.minimizeBg || "#fac536",
     maximizeBg: titlebar.maximizeBg || "#39ea49",
-    burgerBg: titlebar.burgerBg || "white",
-    borderColor: titlebar.borderColor || "#000"
+    optionsBg: titlebar.optionsBg || "white",
+    borderColor: titlebar.borderColor || "#303030",
+    borderHeight: `${parseInt(titlebar.iconRadius)}px`
   };
 }
 
 exports.decorateConfig = config => {
   if (config.showWindowControls == false) return config;
-  let isLeft = config.showWindowsControls === "left";
+  let isLeft = config.showWindowControls === "left";
   let opts = loadTitlebarOptions(config);
 
   return Object.assign({}, config, {
     css: `
       ${config.css || ""}
       .terms_terms {
-        margin-top: -webkit-calc(${opts.iconSize} + 15px);
+        margin-top: ${opts.borderHeight};
       }
       .header_windowHeader {
         visibility: hidden;
       }
       .header {
-        background-color: #303030;
+        background-color: ${opts.borderColor};
         -webkit-app-region: drag;
       }
-      .actions > * {
-        -webkit-app-region: no-drag;
-      }
       .actions {
-        display: -webkit-inline-flex;
+        display: -webkit-flex;
       }
       .actions span {
+        -webkit-app-region: no-drag;
         width: ${opts.iconSize};
         height: ${opts.iconSize};
         border-radius: ${opts.iconRadius};
-        margin: 5px;
+        margin-top: 5px;
         margin-bottom: 7px;
       }
       .close {
         background-color: ${opts.closeBg};
+        order: ${isLeft ? "1" : "4"};
+        margin-right: ${isLeft ? "5px" : "5px"};
+        margin-left: ${isLeft ? "5px" : "5px"};
       }
       .minimize {
         background-color: ${opts.minimizeBg};
+        order: ${isLeft ? "2" : "3"};
+        margin-right: ${isLeft ? "5px" : "5px"};
+        margin-left: ${isLeft ? "5px" : "5px"};
       }
       .maximize {
         background-color: ${opts.maximizeBg};
+        order: ${isLeft ? "3" : "2"};
+        margin-right: ${isLeft ? "5px" : "5px"};
+        margin-left: ${isLeft ? "5px" : "auto"};
       }
-      .burgerMenu {
-        background-color: white;
-        position: absolute;
-        right: 0px;
-      }
-      .header_hamburgerMenuLeft {
-        right : 0px;
+      .optionsMenu {
+        background-color: ${opts.optionsBg};
+        order: ${isLeft ? "4" : "1"};
+        margin-right: ${isLeft ? "5px" : "5px"};
+        margin-left: ${isLeft ? "auto" : "5px"};
       }
     `
   });
@@ -81,7 +87,7 @@ exports.decorateHeader = (Hyper, { React }) => {
       this.closeApp = this.closeApp.bind(this);
       this.minimizeApp = this.minimizeApp.bind(this);
       this.maximizeApp = this.maximizeApp.bind(this);
-      this.burgerMenu = this.burgerMenu.bind(this);
+      this.optionsMenu = this.optionsMenu.bind(this);
     }
 
     closeApp() {
@@ -103,12 +109,13 @@ exports.decorateHeader = (Hyper, { React }) => {
       }
     }
 
-    burgerMenu() {
-      this.props.openHamburgerMenu({ x: 0, y: 32 });
+    optionsMenu() {
+      // this.props.openHamoptionsMenu({x: 0, y: 32});
+      this.props.openHamburgerMenu({ x: 0, y: 0 });
     }
 
     render() {
-      const el = React.createElement(
+      const titlebar = React.createElement(
         "div",
         { className: "header" },
         React.createElement(
@@ -117,13 +124,13 @@ exports.decorateHeader = (Hyper, { React }) => {
           React.createElement("span", { className: "close", onClick: this.closeApp }),
           React.createElement("span", { className: "minimize", onClick: this.minimizeApp }),
           React.createElement("span", { className: "maximize", onClick: this.maximizeApp }),
-          React.createElement("span", { className: "burgerMenu", onClick: this.burgerMenu })
+          React.createElement("span", { className: "optionsMenu", onClick: this.optionsMenu })
         )
       );
       return React.createElement(
         Hyper,
         Object.assign({}, this.props, {
-          customChildren: el
+          customChildren: titlebar
         })
       );
     }
