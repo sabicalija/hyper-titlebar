@@ -13,7 +13,7 @@ function loadTitlebarOptions({ titlebar = {} }) {
     maximizeBg: titlebar.maximizeBg || "#39ea49",
     optionsBg: titlebar.optionsBg || "white",
     borderColor: titlebar.borderColor || "#303030",
-    borderHeight: `${parseInt(titlebar.iconRadius)}px`,
+    borderHeight: `${parseInt(titlebar.iconSize) + 14}px`,
     borderRadius: titlebar.borderRadius || false
   };
 }
