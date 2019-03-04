@@ -1,6 +1,11 @@
 {
   "name": "hyper-titlebar",
   "version": "0.0.1",
+  "keywords": [
+    "hyper",
+    "hyper.app",
+    "hyper-plugin"
+  ],
   "description": "",
   "main": "index.js",
   "scripts": {
