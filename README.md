@@ -2,6 +2,16 @@
 
 Note: Prerelease, Version: 0.0.1
 
+## Preview
+
+<div style="align: center;">
+  <img src="img/preview.gif" style="width: 100%;"/>
+</div>
+
+<div style="align: center;">
+  <img src="img/preview2.gif" style="width: 100%;"/>
+</div>
+
 ## Usage
 
 Add following line to `.hyper.js`:
@@ -12,7 +22,7 @@ plugins: [
 ],
 ```
 
-## Configuration Reference
+## Configuration
 
 For customization of the `hyper-titlebar` plugin, add your lines to `.hyper.js`:
 
@@ -60,6 +70,9 @@ titlebar: {
 ```
 
 ### Icons
+
+`hyper-titlebar` integrates support for [FontAweomse](https://fontawesome.com) icons.
+A list of available icons can be found [here](https://fontawesome.com/icons).
 
 ```js
 titlebar: {
